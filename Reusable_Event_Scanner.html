@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  >
+  <meta name="theme-color" content="#171311">
+  <title>Intense Oud Event Check-in</title>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --ink: #171311;
+      --muted: #746b66;
+      --line: #e8dfda;
+      --paper: #f5f0ec;
+      --card: #fffdfb;
+      --rose: #c7919d;
+      --rose-dark: #8e5d69;
+      --success: #187343;
+      --warning: #a06a13;
+      --danger: #a33737;
+      --shadow: 0 22px 65px rgba(43, 29, 25, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(199,145,157,.16), transparent 36%),
+        linear-gradient(180deg, #fbf8f5 0%, var(--paper) 100%);
+      color: var(--ink);
+      font-family:
+        Inter, -apple-system, BlinkMacSystemFont,
+        "Helvetica Neue", Arial, sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page {
+      width: min(100%, 520px);
+      margin: 0 auto;
+      padding: 24px 18px 52px;
+    }
+
+    .masthead {
+      padding: 12px 4px 22px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: var(--rose-dark);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(34px, 9vw, 48px);
+      font-weight: 400;
+      letter-spacing: -.04em;
+      line-height: .98;
+      margin-bottom: 12px;
+    }
+
+    .event-meta {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .card {
+      background: rgba(255,253,251,.92);
+      border: 1px solid rgba(226,215,209,.9);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .section-label {
+      color: var(--rose-dark);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: 13px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 7px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    select,
+    input {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 13px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 4px rgba(199,145,157,.14);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      background: #f8f3f0;
+      border: 1px solid #eee4df;
+      border-radius: 15px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 25px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .source-list {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+
+    .source-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 9px 1px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .source-row strong {
+      color: var(--ink);
+    }
+
+    #reader {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #171311;
+      margin-bottom: 12px;
+    }
+
+    #reader video {
+      border-radius: 16px;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .search-checkin-btn {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 14px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 750;
+      transition: transform .12s, opacity .12s;
+    }
+
+    .primary-btn:active,
+    .secondary-btn:active,
+    .search-checkin-btn:active {
+      transform: scale(.985);
+    }
+
+    .primary-btn {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .primary-btn.stop {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--ink);
+    }
+
+    .secondary-btn {
+      background: #f3e7e9;
+      color: var(--rose-dark);
+    }
+
+    .scanner-status {
+      min-height: 18px;
+      margin-top: 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f1eae6;
+      border-radius: 13px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      border: 0;
+      background: transparent;
+      border-radius: 10px;
+      padding: 10px;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 750;
+      font-size: 12px;
+    }
+
+    .tab.active {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 3px 14px rgba(50,35,30,.08);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .search-row button {
+      width: 96px;
+    }
+
+    .results {
+      margin-top: 12px;
+    }
+
+    .guest-result {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 14px;
+      margin-top: 9px;
+      background: #fff;
+    }
+
+    .guest-result-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .guest-name {
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .guest-source {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .guest-detail {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-bottom: 9px;
+    }
+
+    .guest-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 10px;
+      font-weight: 750;
+      background: #f4efec;
+      color: var(--muted);
+    }
+
+    .badge.approved {
+      background: #e7f4ec;
+      color: var(--success);
+    }
+
+    .badge.arrived {
+      background: #fff1d9;
+      color: var(--warning);
+    }
+
+    .search-checkin-btn {
+      min-height: 42px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .result-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 22px;
+      background: rgba(20,14,12,.68);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+
+    .result-overlay.visible {
+      display: grid;
+    }
+
+    .result-card {
+      width: min(100%, 410px);
+      background: #fffdfb;
+      border-radius: 28px;
+      padding: 32px 24px 24px;
+      text-align: center;
+      box-shadow: 0 30px 90px rgba(0,0,0,.26);
+    }
+
+    .result-symbol {
+      width: 72px;
+      height: 72px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      font-size: 34px;
+      font-weight: 800;
+    }
+
+    .result-card.success .result-symbol {
+      background: #e5f4eb;
+      color: var(--success);
+    }
+
+    .result-card.warning .result-symbol {
+      background: #fff0d4;
+      color: var(--warning);
+    }
+
+    .result-card.error .result-symbol {
+      background: #f9e5e5;
+      color: var(--danger);
+    }
+
+    .result-title {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 29px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+
+    .result-guest {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .result-message {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .tiny-link {
+      display: block;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      text-decoration: underline;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 16px 0 4px;
+    }
+
+    @media (min-width: 700px) {
+      .page {
+        padding-top: 42px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="masthead">
+      <div class="eyebrow">Intense Oud Events</div>
+      <h1 id="eventTitle">Guest Check-in</h1>
+      <div class="event-meta" id="eventMeta">Select an event to begin.</div>
+    </header>
+
+    <section class="card">
+      <div class="section-label">Session</div>
+
+      <div class="field">
+        <label for="eventSelect">Event</label>
+        <select id="eventSelect">
+          <option value="">Loading events...</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="staffName">Checked in by</label>
+        <input
+          id="staffName"
+          type="text"
+          placeholder="Staff name or door station"
+          autocomplete="name"
+        >
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-label">Live attendance</div>
+
+      <div class="stats-grid">
+        <div class="stat">
+          <strong id="arrivedCount">—</strong>
+          <span>Arrived</span>
+        </div>
+        <div class="stat">
+          <strong id="guestCount">—</strong>
+          <span>Expected</span>
+        </div>
+        <div class="stat">
+          <strong id="remainingCount">—</strong>
+          <span>Remaining</span>
+        </div>
+      </div>
+
+      <div class="source-list" id="sourceStats"></div>
+    </section>
+
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-panel="scanPanel">Scan QR</button>
+        <button class="tab" data-panel="searchPanel">Find Guest</button>
+      </div>
+
+      <div id="scanPanel" class="panel active">
+        <div id="reader"></div>
+
+        <button
+          id="cameraButton"
+          class="primary-btn"
+          type="button"
+        >
+          Open Camera
+        </button>
+
+        <div id="scannerStatus" class="scanner-status"></div>
+      </div>
+
+      <div id="searchPanel" class="panel">
+        <div class="search-row">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Name, email, phone or handle"
+            autocomplete="off"
+          >
+          <button id="searchButton" class="secondary-btn" type="button">
+            Search
+          </button>
+        </div>
+
+        <div id="searchResults" class="results"></div>
+      </div>
+    </section>
+
+    <button id="refreshButton" class="tiny-link" type="button">
+      Refresh attendance
+    </button>
+  </main>
+
+  <div id="resultOverlay" class="result-overlay">
+    <div id="resultCard" class="result-card">
+      <div id="resultSymbol" class="result-symbol">✓</div>
+      <div id="resultTitle" class="result-title">Checked in</div>
+      <div id="resultGuest" class="result-guest"></div>
+      <div id="resultMessage" class="result-message"></div>
+      <button id="closeResult" class="primary-btn" type="button">
+        Scan Next Guest
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /*
+     * Paste the Apps Script /exec URL below after deployment.
+     */
+    const APPS_SCRIPT_URL =
+      "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    /*
+     * Optional. Must match SCANNER_CONFIG.SCANNER_KEY in Apps Script.
+     */
+    const SCANNER_KEY = "";
+
+    let qrScanner = null;
+    let scanning = false;
+    let selectedEvent = null;
+    let refreshTimer = null;
+
+    const eventSelect = document.getElementById("eventSelect");
+    const staffName = document.getElementById("staffName");
+    const cameraButton = document.getElementById("cameraButton");
+    const scannerStatus = document.getElementById("scannerStatus");
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const searchResults = document.getElementById("searchResults");
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    async function init() {
+      staffName.value = localStorage.getItem("ioScannerStaff") || "";
+
+      staffName.addEventListener("input", () => {
+        localStorage.setItem("ioScannerStaff", staffName.value.trim());
+      });
+
+      eventSelect.addEventListener("change", handleEventChange);
+      cameraButton.addEventListener("click", toggleScanner);
+      searchButton.addEventListener("click", searchGuests);
+      searchInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") searchGuests();
+      });
+
+      document
+        .getElementById("refreshButton")
+        .addEventListener("click", loadStats);
+
+      document
+        .getElementById("closeResult")
+        .addEventListener("click", closeResult);
+
+      document.querySelectorAll(".tab").forEach(button => {
+        button.addEventListener("click", () => switchPanel(button));
+      });
+
+      await loadEvents();
+
+      refreshTimer = setInterval(() => {
+        if (selectedEvent) loadStats();
+      }, 30000);
+    }
+
+    function switchPanel(button) {
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.toggle("active", tab === button);
+      });
+
+      document.querySelectorAll(".panel").forEach(panel => {
+        panel.classList.toggle(
+          "active",
+          panel.id === button.dataset.panel
+        );
+      });
+
+      if (button.dataset.panel !== "scanPanel" && scanning) {
+        stopScanner();
+      }
+    }
+
+    async function loadEvents() {
+      try {
+        const data = await apiRequest("events");
+
+        eventSelect.innerHTML =
+          '<option value="">Select an event</option>';
+
+        (data.events || []).forEach(event => {
+          const option = document.createElement("option");
+          option.value = event.id;
+          option.textContent = event.name;
+          option.dataset.event = JSON.stringify(event);
+          eventSelect.appendChild(option);
+        });
+
+        const requestedEvent =
+          new URLSearchParams(location.search).get("event");
+
+        const rememberedEvent =
+          localStorage.getItem("ioScannerEvent");
+
+        const preferredEvent =
+          requestedEvent || rememberedEvent || "";
+
+        if (
+          preferredEvent &&
+          [...eventSelect.options].some(
+            option => option.value === preferredEvent
+          )
+        ) {
+          eventSelect.value = preferredEvent;
+          handleEventChange();
+        }
+
+      } catch (error) {
+        eventSelect.innerHTML =
+          '<option value="">Could not load events</option>';
+
+        showResult({
+          status: "error",
+          message: error.message
+        });
+      }
+    }
+
+    function handleEventChange() {
+      const option =
+        eventSelect.options[eventSelect.selectedIndex];
+
+      selectedEvent =
+        option && option.dataset.event
+          ? JSON.parse(option.dataset.event)
+          : null;
+
+      if (!selectedEvent) {
+        document.getElementById("eventTitle").textContent =
+          "Guest Check-in";
+        document.getElementById("eventMeta").textContent =
+          "Select an event to begin.";
+        clearStats();
+        return;
+      }
+
+      localStorage.setItem("ioScannerEvent", selectedEvent.id);
+
+      document.getElementById("eventTitle").textContent =
+        selectedEvent.name || "Guest Check-in";
+
+      const metadata = [
+        selectedEvent.date,
+        selectedEvent.venue,
+        selectedEvent.subtitle
+      ].filter(Boolean);
+
+      document.getElementById("eventMeta").textContent =
+        metadata.join(" · ");
+
+      searchResults.innerHTML = "";
+      loadStats();
+    }
+
+    async function loadStats() {
+      if (!selectedEvent) {
+        clearStats();
+        return;
+      }
+
+      try {
+        const data = await apiRequest("stats", {
+          eventId: selectedEvent.id
+        });
+
+        document.getElementById("arrivedCount").textContent =
+          data.total.arrived;
+
+        document.getElementById("guestCount").textContent =
+          data.total.people;
+
+        document.getElementById("remainingCount").textContent =
+          data.total.remaining;
+
+        const sourceLabels = {
+          "RSVPs": "Shopify RSVPs",
+          "Employees": "Employees & Guests",
+          "B2B Partners": "B2B Partners",
+          "META RSVPs": "Meta RSVPs"
+        };
+
+        const rows = Object.values(data.sources || {})
+          .map(source => `
+            <div class="source-row">
+              <span>${escapeHtml(
+                sourceLabels[source.source] || source.source
+              )}</span>
+              <strong>${source.arrived} / ${source.people}</strong>
+            </div>
+          `)
+          .join("");
+
+        document.getElementById("sourceStats").innerHTML =
+          rows || '<div class="empty">No approved guests yet.</div>';
+
+      } catch (error) {
+        document.getElementById("sourceStats").innerHTML =
+          '<div class="empty">Could not refresh attendance.</div>';
+      }
+    }
+
+    function clearStats() {
+      ["arrivedCount", "guestCount", "remainingCount"]
+        .forEach(id => {
+          document.getElementById(id).textContent = "—";
+        });
+
+      document.getElementById("sourceStats").innerHTML = "";
+    }
+
+    async function toggleScanner() {
+      if (scanning) {
+        await stopScanner();
+        return;
+      }
+
+      if (!selectedEvent) {
+        showResult({
+          status: "error",
+          message: "Select an event before opening the camera."
+        });
+        return;
+      }
+
+      qrScanner = new Html5Qrcode("reader");
+      scanning = true;
+
+      cameraButton.textContent = "Stop Camera";
+      cameraButton.classList.add("stop");
+      scannerStatus.textContent =
+        "Point the camera at the guest QR code.";
+
+      try {
+        await qrScanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1,
+            showTorchButtonIfSupported: true
+          },
+          handleScanSuccess,
+          () => {}
+        );
+      } catch (error) {
+        scanning = false;
+        cameraButton.textContent = "Open Camera";
+        cameraButton.classList.remove("stop");
+        scannerStatus.textContent =
+          "Camera unavailable. Check browser permissions.";
+      }
+    }
+
+    async function stopScanner() {
+      if (!qrScanner || !scanning) return;
+
+      try {
+        await qrScanner.stop();
+        await qrScanner.clear();
+      } catch (ignore) {}
+
+      scanning = false;
+      qrScanner = null;
+      cameraButton.textContent = "Open Camera";
+      cameraButton.classList.remove("stop");
+      scannerStatus.textContent = "";
+    }
+
+    async function handleScanSuccess(decodedText) {
+      await stopScanner();
+      await checkInUid(decodedText);
+    }
+
+    async function checkInUid(rawUid) {
+      try {
+        const data = await apiRequest("checkin", {
+          uid: rawUid,
+          eventId: selectedEvent.id,
+          staff: getStaffName()
+        });
+
+        showResult(data);
+        loadStats();
+
+      } catch (error) {
+        showResult({
+          status: "error",
+          message: error.message
+        });
+      }
+    }
+
+    async function searchGuests() {
+      if (!selectedEvent) {
+        showResult({
+          status: "error",
+          message: "Select an event first."
+        });
+        return;
+      }
+
+      const query = searchInput.value.trim();
+
+      if (query.length < 2) {
+        searchResults.innerHTML =
+          '<div class="empty">Enter at least two characters.</div>';
+        return;
+      }
+
+      searchResults.innerHTML =
+        '<div class="empty">Searching...</div>';
+
+      try {
+        const data = await apiRequest("search", {
+          eventId: selectedEvent.id,
+          q: query
+        });
+
+        renderSearchResults(data.results || []);
+
+      } catch (error) {
+        searchResults.innerHTML =
+          `<div class="empty">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function renderSearchResults(results) {
+      if (!results.length) {
+        searchResults.innerHTML =
+          '<div class="empty">No matching guests found.</div>';
+        return;
+      }
+
+      searchResults.innerHTML = results.map((guest, index) => {
+        const statusClass =
+          guest.status.toLowerCase() === "approved"
+            ? "approved"
+            : "";
+
+        const arrivedClass =
+          guest.checkinStatus.toLowerCase() === "arrived"
+            ? "arrived"
+            : "";
+
+        return `
+          <article class="guest-result">
+            <div class="guest-result-header">
+              <div class="guest-name">${escapeHtml(guest.name)}</div>
+              <div class="guest-source">${escapeHtml(guest.sheet)}</div>
+            </div>
+
+            <div class="guest-detail">
+              ${escapeHtml(guest.contact || "No contact shown")}
+            </div>
+
+            <div class="guest-badges">
+              <span class="badge ${statusClass}">
+                ${escapeHtml(guest.status || "No status")}
+              </span>
+              <span class="badge ${arrivedClass}">
+                ${escapeHtml(guest.checkinStatus)}
+              </span>
+              <span class="badge">
+                Party of ${guest.partySize}
+              </span>
+            </div>
+
+            <button
+              class="search-checkin-btn"
+              type="button"
+              data-result-index="${index}"
+            >
+              Check In Guest
+            </button>
+          </article>
+        `;
+      }).join("");
+
+      searchResults
+        .querySelectorAll("[data-result-index]")
+        .forEach(button => {
+          button.addEventListener("click", () => {
+            const guest =
+              results[Number(button.dataset.resultIndex)];
+
+            manualCheckIn(guest);
+          });
+        });
+    }
+
+    async function manualCheckIn(guest) {
+      try {
+        const data = await apiRequest("manualcheckin", {
+          eventId: selectedEvent.id,
+          sheet: guest.sheet,
+          row: guest.row,
+          staff: getStaffName()
+        });
+
+        showResult(data);
+        loadStats();
+        searchGuests();
+
+      } catch (error) {
+        showResult({
+          status: "error",
+          message: error.message
+        });
+      }
+    }
+
+    function getStaffName() {
+      return staffName.value.trim() || "Door Team";
+    }
+
+    function showResult(data) {
+      const overlay = document.getElementById("resultOverlay");
+      const card = document.getElementById("resultCard");
+      const symbol = document.getElementById("resultSymbol");
+      const title = document.getElementById("resultTitle");
+      const guest = document.getElementById("resultGuest");
+      const message = document.getElementById("resultMessage");
+
+      const status =
+        ["success", "warning", "error"].includes(data.status)
+          ? data.status
+          : "error";
+
+      card.className = `result-card ${status}`;
+
+      symbol.textContent =
+        status === "success"
+          ? "✓"
+          : status === "warning"
+            ? "!"
+            : "×";
+
+      title.textContent =
+        status === "success"
+          ? "Welcome"
+          : status === "warning"
+            ? "Already Arrived"
+            : "Unable to Check In";
+
+      guest.textContent = data.guest || "";
+      message.textContent =
+        data.message || "Something went wrong.";
+
+      overlay.classList.add("visible");
+    }
+
+    function closeResult() {
+      document
+        .getElementById("resultOverlay")
+        .classList.remove("visible");
+
+      searchInput.focus();
+    }
+
+    async function apiRequest(action, params = {}) {
+      if (
+        !APPS_SCRIPT_URL ||
+        APPS_SCRIPT_URL.includes("PASTE_YOUR")
+      ) {
+        throw new Error(
+          "Add your Apps Script web app URL inside the scanner file."
+        );
+      }
+
+      const url = new URL(APPS_SCRIPT_URL);
+
+      url.searchParams.set("action", action);
+
+      if (SCANNER_KEY) {
+        url.searchParams.set("key", SCANNER_KEY);
+      }
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.set(key, value);
+        }
+      });
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        cache: "no-store",
+        redirect: "follow"
+      });
+
+      if (!response.ok) {
+        throw new Error("Scanner server did not respond.");
+      }
+
+      const data = await response.json();
+
+      if (data.ok === false && action !== "checkin") {
+        throw new Error(data.message || "Scanner request failed.");
+      }
+
+      return data;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
